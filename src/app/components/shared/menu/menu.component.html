@@ -1,0 +1,23 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand margin-right-ajust">
+        <img src="../../../../assets/icon.png" width="30" height="30" alt="">
+    </a>
+    <button class="navbar-toggler" (click)="ToggleMenu()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" [ngClass]="{show: IsShowMenuMobile}">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" target="_blank" href="http://www.wayback.com.br/enegociador/">Sobre</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" target="_blank" href="http://www.wayback.com.br/enegociador/">Redes</a>
+            </li>
+        </ul>
+        <div class="my-2 my-lg-0">
+            <a class="nav-item active d-none d-lg-block" href="http://www.wayback.com.br/enegociador/">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </a>
+        </div>
+    </div>
+</nav>
