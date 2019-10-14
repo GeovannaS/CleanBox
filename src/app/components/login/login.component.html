@@ -7,7 +7,7 @@
     <div class="jumbotron jumbotron-just ">
       <div class="row justify-content-center">
         <div class="text-center">
-            <img src="../../../assets/Logo.png" alt="logo_wayback.png" height="120" width="300">
+            <img src="../../../assets/Logo.png" alt="Logo.png" height="120" width="300">
         </div>
       </div> 
       <hr class="my-4">
@@ -25,7 +25,11 @@
         <div class="form-group">
           <label for="inSenha" class="col-12 control-label font-style-label-form color-just">Senha:</label>
           <div class="col-12">
-            <input type="password" name="senha" class="form-control" id="inSenha" placeholder="Senha" formControlName="senha">
+            <input type="password" name="senha" class="form-control" id="inSenha" placeholder="Senha" formControlName="senha"
+              [ngClass]="{'is-invalid': (!form.controls.senha.valid && !form.controls.senha.pristine)}">
+            <div class="invalid-feedback" *ngIf="!form.controls.senha.valid && !form.controls.senha.pristine">
+              {{ msgSenhaInvalida }}
+            </div>
           </div>
         </div>
         <div class="form-group">

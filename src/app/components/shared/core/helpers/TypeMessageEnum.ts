@@ -1,6 +1,5 @@
 export enum TypeMessageEnum{
-    Error = "danger",
-    Sucess = "success",
-    Warning = "warning",
-    Info = "info"
+    Error = "Erro!",
+    Sucess = "Sucesso!",
+    Warning = "Atenção!"
 }

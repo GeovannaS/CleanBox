@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-home',
@@ -6,11 +7,22 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-
-  constructor() { }
+  public IsFluid: boolean = false;
+  showNavigationArrows = true;
+  showNavigationIndicators = false;
+  
+  constructor(config: NgbCarouselConfig) { 
+    config.showNavigationArrows = true;
+    config.showNavigationIndicators = false;
+  }
 
   ngOnInit() {
-    console.log("veio");
+    
   }
+
+  @HostListener('window:resize', ['$event'])
+	onResize(event?) {
+		this.IsFluid = (window.innerWidth <= 991);
+	}
 
 }

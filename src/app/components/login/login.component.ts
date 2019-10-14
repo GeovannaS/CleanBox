@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { LoginService } from './login.service';
-import { AlertService } from '../shared/alert/alert.service';
 import { MessagesEnum } from '../shared/core/helpers/MessagesEnum';
+import { ToastrService } from 'ngx-toastr';
 import { TypeMessageEnum } from '../shared/core/helpers/TypeMessageEnum';
 
 @Component({
@@ -15,13 +15,15 @@ export class LoginComponent implements OnInit {
   public form: FormGroup
 
   msgLoginInvalido: string = "Preencha o campo usuário!";
+  msgSenhaInvalida: string = "Preencha o campo senha!";
 
   constructor(
     private _formBuilder: FormBuilder,
     private _loginService: LoginService,
-    private _alertService: AlertService) { }
+    private _toastService: ToastrService) { }
 
   ngOnInit() {
+    localStorage.clear();
     this.CreateValidationForm();
   }
 
@@ -36,7 +38,11 @@ export class LoginComponent implements OnInit {
     if (this.form.valid) {
       this._loginService.FazerLogin(this.form.value.login, this.form.value.senha)
     } else {
-      this._alertService.NewMessage(MessagesEnum._001, TypeMessageEnum.Warning);
+      this._toastService.warning(MessagesEnum._000, TypeMessageEnum.Warning, {
+        timeOut: 2000,
+        positionClass: 'toast-bottom-right',
+        progressBar: true
+      });
     }
   }
 }

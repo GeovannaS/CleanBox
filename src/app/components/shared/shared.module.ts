@@ -4,31 +4,30 @@ import { FooterComponent } from './footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { BRComponent } from './br/br.component';
 import { ContentComponent } from './content/content.component';
-import { AlertComponent } from './alert/alert.component';
-import { AlertService } from './alert/alert.service';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterModule } from '@angular/router';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    NgbModule.forRoot(),    
+    NgbModule.forRoot(),
+    RouterModule  
   ],
   declarations: [
       MenuComponent, 
       FooterComponent,
       BRComponent,
       ContentComponent,
-      AlertComponent
+      HeaderComponent
     ],
-  providers:[
-    AlertService
-  ],
+  providers:[],
   exports:[
       MenuComponent,
       FooterComponent,
       BRComponent,
       ContentComponent,
-      AlertComponent
+      HeaderComponent
     ]
 })
 
