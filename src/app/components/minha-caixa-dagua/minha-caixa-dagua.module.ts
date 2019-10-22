@@ -4,15 +4,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../shared/shared.module';
 import { MinhaCaixaDaguaComponent } from './minha-caixa-dagua.component';
 import { MinhaCaixaDaguaService } from './minha-caixa-dagua.service';
-import { NgChartjsModule } from 'ng-chartjs';
+import { ChartModule } from 'angular2-chartjs';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    SharedModule,
-    NgChartjsModule
+    ChartModule,
+    SharedModule
   ],
   declarations: [
     MinhaCaixaDaguaComponent

@@ -11,22 +11,35 @@ export class LoginService {
   constructor(
     private _router: Router,
     private _toastService: ToastrService) {
+      if (localStorage.getItem("isUserLoggedIn") == "true")
+        this.RedirectToURL();
   }
 
   public FazerLogin(usuario: string, senha: string) {
     if (usuario == "admin" && senha == "admin") {
       this.loginEmit.emit(true);
-      localStorage.setItem("isUserLoggedIn", "true");
+      this.setData("true");
       return this.RedirectToURL();
     } else {
       this.loginEmit.emit(false);
-      localStorage.setItem("isUserLoggedIn", "false");
+      this.setData("false");
       this._toastService.error(MessagesEnum._001, TypeMessageEnum.Error, {
         timeOut: 2000,
         positionClass: 'toast-bottom-right',
         progressBar: true
       });
     }
+  }
+
+  public setData(isUserLoggedIn: string) {
+    localStorage.setItem("isUserLoggedIn", isUserLoggedIn);
+    this.loginEmit.emit(localStorage.getItem("isUserLoggedIn") == "true");
+
+    if (localStorage.getItem("isUserLoggedIn") == "true") {
+      return this.RedirectToURL();
+    }
+
+    return this.RedirectToURL('');
   }
 
   public Logout() {

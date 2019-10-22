@@ -1,58 +1,222 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { MqttService, IMqttMessage } from 'ngx-mqtt';
+import { MinhaCaixaDaguaService } from './minha-caixa-dagua.service';
+import { error } from 'util';
+import { ToastrService } from 'ngx-toastr';
+import { MessagesEnum } from '../shared/core/helpers/MessagesEnum';
+import { TypeMessageEnum } from '../shared/core/helpers/TypeMessageEnum';
 
 @Component({
   selector: 'app-minha-caixa-dagua',
   templateUrl: './minha-caixa-dagua.component.html',
   styleUrls: ['./minha-caixa-dagua.component.scss']
 })
-export class MinhaCaixaDaguaComponent implements OnInit {
+export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
 
-  public barChartOptions: any = {
-    scaleShowVerticalLines: false,
-    responsive: true
+  private subscription: Subscription;
+  public message: string;
+
+  dataInicial;
+  dataFinal;
+
+  type = 'bar';
+
+  bgSuccess = "rgb(50, 168, 82)";
+  bgWarning = "rgb(255, 132, 0)";
+  bgAtention = "rgb(168, 50, 50)";
+
+  dataNTU;
+  dataPH;
+
+  options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    elements: {
+      point: { hitRadius: 5, hoverRadius: 5, radius: 0 }
+    },
+    tooltips: {
+      mode: 'index',
+      intersect: true
+    },
+    legend: {
+      display: false
+    }
   };
-  public barChartLabels: string[] = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
-  public barChartType = 'bar';
-  public barChartLegend = true;
 
-  public barChartData: any[] = [
-    { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A' },
-    { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B' }
-  ];
+  showSpinnerGraphpH: boolean = false;
+  errorGraphpH: boolean = true;
 
-  constructor() { }
+  showSpinnerGraphNTU: boolean = false;
+  errorGraphNTU: boolean = true;
+
+  constructor(
+    private _mqttService: MqttService,
+    private _minhaCaixaDaguaService: MinhaCaixaDaguaService,
+    private _toastService: ToastrService) {
+    this.subscription = this._mqttService.observe('dados').subscribe((message: IMqttMessage) => {
+      console.log(message.payload.toString());
+    });
+  }
 
   ngOnInit() {
+
   }
 
-  // events
-  public chartClicked(e: any): void {
-    console.log(e);
+  changeData() {
+    this.showSpinnerGraphpH = true;
+    this.showSpinnerGraphNTU = true;
+
+    if (this.dataInicial == null || this.dataInicial == '' || this.dataInicial == "" || this.dataInicial == undefined) {
+      this.errorGraphpH = true; 
+      this.errorGraphNTU = true; 
+
+      this._toastService.error(MessagesEnum._003, TypeMessageEnum.Warning, {
+        timeOut: 2000,
+        positionClass: 'toast-bottom-right',
+        progressBar: true
+      });
+    } else if (this.dataFinal == null || this.dataFinal == '' || this.dataFinal == "" || this.dataFinal == undefined) {
+      this.errorGraphpH = true; 
+      this.errorGraphNTU = true; 
+
+      this._toastService.error(MessagesEnum._004, TypeMessageEnum.Warning, {
+        timeOut: 2000,
+        positionClass: 'toast-bottom-right',
+        progressBar: true
+      });
+    } else if ((this.dataFinal == null || this.dataFinal == '' || this.dataFinal == "" || this.dataFinal == undefined) && (this.dataInicial == null || this.dataInicial == '' || this.dataInicial == "" || this.dataInicial == undefined)) {
+      this.errorGraphpH = true; 
+      this.errorGraphNTU = true; 
+
+      this._toastService.error(MessagesEnum._005, TypeMessageEnum.Warning, {
+        timeOut: 2000,
+        positionClass: 'toast-bottom-right',
+        progressBar: true
+      });
+    } else {
+      this._minhaCaixaDaguaService.GetGraph(this.dataInicial, this.dataFinal).subscribe(
+        data => {
+
+          if (data == null || data == '' || data == "" || data == undefined) {
+            this.errorGraphpH = true; 
+            this.errorGraphNTU = true; 
+
+            this._toastService.error(MessagesEnum._002, TypeMessageEnum.Error, {
+              timeOut: 2000,
+              positionClass: 'toast-bottom-right',
+              progressBar: true
+            });
+          } else if (data.length >= 1) {
+            this.errorGraphpH = false;
+            this.errorGraphNTU = false;
+
+            data.forEach(dia => {
+              let date = new Date(dia.data);
+
+              dia.data = ('0' + (date.getDate() + 1)).slice(-2) + '/' + 
+                         ('0' + (date.getMonth() + 1)).slice(-2) + '/' +
+                         date.getFullYear();
+
+              dia.detalhesDia.forEach(detalhe => {
+                detalhe.ntu = detalhe.ntu.toFixed(0);
+
+                if (detalhe.ntu > 350) {
+                  detalhe.bgColorNTU = this.bgSuccess;
+                } else if (detalhe.ntu > 280 && detalhe.ntu < 350) {
+                  detalhe.bgColorNTU = this.bgWarning;
+                } else if (detalhe.ntu < 280) {
+                  detalhe.bgColorNTU = this.bgAtention;
+                }
+
+                if (detalhe.ph < 6 || detalhe.ph > 8) {
+                  detalhe.bgColorPH = this.bgAtention;
+                } else {
+                  detalhe.bgColorPH = this.bgSuccess;
+                }
+              });  
+            });
+
+            this.dataNTU = {
+              labels: data.map(x => x.data),
+              datasets: [{
+                label: 'Manhã',
+                backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorNTU)),
+                borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorNTU)),
+                hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorNTU)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.ntu)),
+                fill: false
+              },
+              {
+                label: 'Tarde',
+                backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorNTU)),
+                borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorNTU)),
+                hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorNTU)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.ntu)),
+                fill: false
+              },
+              {
+                label: 'Noite',
+                backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorNTU)),
+                borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorNTU)),
+                hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorNTU)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.ntu)),
+                fill: false
+              }],
+            };
+            
+            this.dataPH = {
+              labels: data.map(x => x.data),
+              datasets: [{
+                label: 'Manhã',
+                backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorPH)),
+                borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorPH)),
+                hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorPH)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.ph.toFixed(1))),
+                fill: false
+              },
+              {
+                label: 'Tarde',
+                backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorPH)),
+                borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorPH)),
+                hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorPH)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.ph.toFixed(1))),
+                fill: false
+              },
+              {
+                label: 'Noite',
+                backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorPH)),
+                borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorPH)),
+                hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorPH)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.ph.toFixed(1))),
+                fill: false
+              }],
+            };   
+          }
+
+          this.showSpinnerGraphpH = false;
+          this.showSpinnerGraphNTU = false;
+        },
+        error => {
+          this.errorGraphpH = true;
+          this.errorGraphNTU = true;
+
+          this._toastService.error(error, TypeMessageEnum.Error, {
+            timeOut: 2000,
+            positionClass: 'toast-bottom-right',
+            progressBar: true
+          });
+        });        
+    }
+
   }
 
-  public chartHovered(e: any): void {
-    console.log(e);
+  public unsafePublish(topic: string, message: string): void {
+    this._mqttService.unsafePublish(topic, message, {qos: 1, retain: true});
   }
 
-  public randomize(): void {
-    // Only Change 3 values
-    const data = [
-      Math.round(Math.random() * 100),
-      59,
-      80,
-      (Math.random() * 100),
-      56,
-      (Math.random() * 100),
-      40];
-    const clone = JSON.parse(JSON.stringify(this.barChartData));
-    clone[0].data = data;
-    this.barChartData = clone;
-    /**
-     * (My guess), for Angular to recognize the change in the dataset
-     * it has to change the dataset variable directly,
-     * so one way around it, is to clone the data, change it and then
-     * assign it;
-     */
+  public ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
 }

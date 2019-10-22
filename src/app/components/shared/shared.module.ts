@@ -7,6 +7,10 @@ import { ContentComponent } from './content/content.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from './header/header.component';
+import { CardRefreshDirective } from './card/card-refresh.directive';
+import { CardToggleDirective } from './card/card-toggle.directive';
+import { CardComponent } from './card/card.component';
+import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
 
 @NgModule({
   imports: [
@@ -19,7 +23,11 @@ import { HeaderComponent } from './header/header.component';
       FooterComponent,
       BRComponent,
       ContentComponent,
-      HeaderComponent
+      HeaderComponent,
+      CardRefreshDirective,
+      CardToggleDirective,
+      CardComponent,
+      LoadingSpinnerComponent
     ],
   providers:[],
   exports:[
@@ -27,7 +35,11 @@ import { HeaderComponent } from './header/header.component';
       FooterComponent,
       BRComponent,
       ContentComponent,
-      HeaderComponent
+      HeaderComponent,
+      CardRefreshDirective,
+      CardToggleDirective,
+      CardComponent,
+      LoadingSpinnerComponent
     ]
 })
 
