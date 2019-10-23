@@ -34,7 +34,8 @@
    margin-left: 10px;
   }
   
-   .legend { list-style: none; }
+
+   .legend { list-style: none; padding: 10px; }
    .legend span { margin-top: 7px; margin-right: 2px; border: 1px solid #ccc; float: left; width: 25px; height: 12px; }
    .legend .otima { background-color: rgb(50, 168, 82); }
    .legend .particulas { background-color: rgb(255, 132, 0); }
@@ -48,9 +49,13 @@
 
    fieldset {
     border: 1px solid black;
-    width: 300px;
+    width: 520px;
     margin-left: 20px;
     margin-bottom: 10px;
+
+    @media screen and (max-width: 575px) {
+      width: 90%;
+    }
    }
 
    .spinnerGraph {

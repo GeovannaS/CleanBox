@@ -29,6 +29,9 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
   dataNTU;
   dataPH;
 
+  valorPH = 0;
+  valorNTU = 0;
+
   options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -55,7 +58,9 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
     private _minhaCaixaDaguaService: MinhaCaixaDaguaService,
     private _toastService: ToastrService) {
     this.subscription = this._mqttService.observe('dados').subscribe((message: IMqttMessage) => {
-      console.log(message.payload.toString());
+      let valoresTempoReal = message.payload.toString().split("|");
+      this.valorPH = parseInt(parseInt(valoresTempoReal[0]).toFixed(0));
+      this.valorNTU = parseInt(parseInt(valoresTempoReal[1]).toFixed(0));
     });
   }
 
@@ -119,8 +124,6 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
                          date.getFullYear();
 
               dia.detalhesDia.forEach(detalhe => {
-                detalhe.ntu = detalhe.ntu.toFixed(0);
-
                 if (detalhe.ntu > 350) {
                   detalhe.bgColorNTU = this.bgSuccess;
                 } else if (detalhe.ntu > 280 && detalhe.ntu < 350) {
@@ -144,7 +147,7 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
                 backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorNTU)),
                 borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorNTU)),
                 hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorNTU)),
-                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.ntu)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.ntu.toFixed(2))),
                 fill: false
               },
               {
@@ -152,7 +155,7 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
                 backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorNTU)),
                 borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorNTU)),
                 hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorNTU)),
-                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.ntu)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.ntu.toFixed(2))),
                 fill: false
               },
               {
@@ -160,7 +163,7 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
                 backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorNTU)),
                 borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorNTU)),
                 hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorNTU)),
-                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.ntu)),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.ntu.toFixed(2))),
                 fill: false
               }],
             };
@@ -172,7 +175,7 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
                 backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorPH)),
                 borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorPH)),
                 hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.bgColorPH)),
-                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.ph.toFixed(1))),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "MANHA").map(y => y.ph.toFixed(2))),
                 fill: false
               },
               {
@@ -180,7 +183,7 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
                 backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorPH)),
                 borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorPH)),
                 hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.bgColorPH)),
-                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.ph.toFixed(1))),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "TARDE").map(y => y.ph.toFixed(2))),
                 fill: false
               },
               {
@@ -188,7 +191,7 @@ export class MinhaCaixaDaguaComponent implements OnInit, OnDestroy {
                 backgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorPH)),
                 borderColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorPH)),
                 hoverBackgroundColor: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.bgColorPH)),
-                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.ph.toFixed(1))),
+                data: data.map(x => x.detalhesDia.filter(x => x.periodo == "NOITE").map(y => y.ph.toFixed(2))),
                 fill: false
               }],
             };   

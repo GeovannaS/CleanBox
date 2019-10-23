@@ -2,6 +2,30 @@
 
 <app-br></app-br>
 
+<app-card [title]="'Dados em tempo real'" [headerContent]="''" [visibleMenuHeader]="false">
+  <div class="row justify-content-md-center">
+    <div class="col col-lg-4">
+      <div class="card text-center bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">Turbidez (NTU)</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ valorNTU }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-auto">
+    </div>
+    <div class="col col-lg-4">
+      <div class="card text-center bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">pH</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ valorPH }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-card>
+
+
 <app-card [title]="'Gráficos'" [headerContent]="''" [visibleMenuHeader]="false">
   <div class="row">
     <div class="col-12">
@@ -20,9 +44,9 @@
       <fieldset>
         <legend>Turbidez (NTU)</legend>
           <ul class="legend">
-            <li><span class="otima"></span>Água própria para consumo</li>
-            <li><span class="particulas"></span>Água com partículas</li>
-            <li><span class="suja"></span>Água imprópria para consumo</li>
+            <li><span class="otima"></span>Água própria para consumo (maior que 350)</li>
+            <li><span class="particulas"></span>Água com partículas (280 a 350)</li>
+            <li><span class="suja"></span>Água imprópria para consumo (menor que 280)</li>
           </ul>        
       </fieldset>
     </div>
@@ -45,8 +69,8 @@
       <fieldset>
         <legend>pH</legend>
           <ul class="legend">
-            <li><span class="otima"></span>Água própria para consumo</li>
-            <li><span class="suja"></span>Água imprópria para consumo</li>
+            <li><span class="otima"></span>Água própria para consumo (6 a 8)</li>
+            <li><span class="suja"></span>Água imprópria para consumo (menor que 6 ou maior que 8)</li>
           </ul>        
       </fieldset>
     </div>
